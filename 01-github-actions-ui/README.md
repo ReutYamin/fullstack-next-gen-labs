@@ -1,57 +1,129 @@
 # GitHub Actions Lab 01: Core Infrastructure & Pipeline UI
 
+במעבדה זו נכיר לראשונה את **GitHub Actions** ונבנה את ה־Workflow הראשון שלנו. במהלך העבודה נלמד כיצד Pipeline מופעל, כיצד לקרוא את ה־Logs, כיצד לאתר תקלות, ומדוע כל ריצה מתבצעת על שרת זמני (Runner).
+
+---
+
 ## מטרות המעבדה
-* מעבר למנוע אקטיבי: שינוי תפיסתי משימוש ב-GitHub כרכיב אחסון פסיבי למערכת אוטומציה אקטיבית המגיבה לאירועי קוד (CI/CD).
-* שליטה בממשק המשתמש (UI): היכרות עמוקה עם לשונית ה-Actions, יכולת ניווט בין הריצות (Workflow Runs) השונות, הבנת היררכיית התהליך, וקריאת Live Log Streaming.
-* ארכיטקטורת ה-Runner: הבנת הקונספט של שרת וירטואלי ארעי וריק (תאוריית "המטבח הריק") והחובה המפורשת למשוך את הקוד (Checkout) בכל ריצה מחדש.
-* פיתוח מסוגלות דיבאגינג בענן: יכולת לאבחן תקלות ריצה (Runtime Errors) בסביבה מרוחקת, תוך קריאה ביקורתית ובידוד שגיאות מתוך ה-Raw Logs.
-* שילוב בינה מלאכותית: שימוש מובנה ומדויק ב-Prompt Engineering לתכנון ויצירת תשתיות אוטומציה בצורה מאובטחת.
+
+בסיום המעבדה תדעו:
+
+* ליצור Workflow ראשון ב־GitHub Actions.
+* להפעיל Pipeline באמצעות `git push`.
+* לנווט בממשק GitHub Actions.
+* לקרוא ולהבין את ה־Logs של ה־Workflow.
+* להבין כיצד עובד GitHub Runner.
+* להשתמש בכלי AI ליצירת Workflow בסיסי.
 
 ---
 
-## משימה 1: Pipeline Initialization & UI Onboarding
+## רקע
 
-### רקע והקשר
-הקמת Workflow בסיסי בענן על גבי פרויקט Full-Stack לצורך הכרת ה-UI ושבירת מחסום ההרצה הראשונית של פקודות בשרת מרוחק.
+מערכת GitHub Actions היא מערכת CI/CD המובנית בתוך GitHub ומאפשרת להריץ תהליכים באופן אוטומטי בעקבות אירועים שונים, כגון `Push`, `Pull Request` או יצירת `Release`.
 
-### הנחיות לביצוע שלב-אחר-שלב
-1. היכנסו למאגר (Repository) של הפרויקט שלכם ב-GitHub דרך הדפדפן ונווטו ללשונית ה-Actions בסרגל העליון.
-2. בחרו מתוך ההצעות את התבנית (Template) מסוג Simple Workflow או Node.js ולחצו על כפתור ה-Configure.
-3. בעורך שייפתח, אתרו את הבלוק של ה-steps ומחקו את פקודות ברירת המחדל המורכבות המופיעות שם.
-4. כתבו במקומן פקודות run עצמאיות ופשוטות משלכם: פקודה אחת שמדפיסה מחרוזת טקסט לבחירתכם (בעזרת echo), ופקודה שנייה ששולפת ומדפיסה את גרסת ה-CLI של שפת הליבה של הפרויקט שלכם (למשל גרסת ה-Node או ה-Python).
-5. בצעו Commit ישירות לענף ה-main. פעולה זו מהווה טריגר ותפעיל את ה-Push event שעליו מוגדר ה-Workflow.
-6. חזרו מיד ללשונית ה-Actions. אתרו את הריצה החדשה שנוצרה, היכנסו פנימה, ועקבו אחר ה-Live Log Streaming במסך השחור עד שהתהליך מסתיים בסטטוס ירוק.
+כל Workflow רץ על **GitHub Runner** – שרת זמני שנוצר מחדש עבור כל הרצה. המשמעות היא שבכל פעם שה־Workflow מתחיל, סביבת העבודה ריקה לחלוטין, ולכן יש להוריד את קוד הפרויקט מחדש לפני שמבצעים פעולות עליו.
 
 ---
 
-## משימה 2: Runtime Breakage & Log Diagnostics
+## משימה 1 – יצירת Workflow ראשון
 
-### רקע והקשר
-פיתוח מיומנות לאיתור ופתרון כשלים ודיבאגינג בענן, באמצעות ניתוח פלטי מערכת גולמיים. סביבת הענן אינה מאפשרת הצבת Breakpoints, ולכן אנו מסתמכים לחלוטין על ניווט נכון בממשק הלוגים.
+### שלבי העבודה
 
-### הנחיות לביצוע שלב-אחר-שלב
-1. פתחו את קוד הפרויקט המקומי שלכם בסביבת הפיתוח (VSCode). הזריקו פנימה שגיאת ריצה (Runtime) מכוונת. תוכלו לעשות זאת על ידי הכנסת שגיאת סינטקס ברורה בקוד, או על ידי שינוי סקריפט ההרצה בקובץ ה-package.json (או requirements.txt) כך שיקרא לפקודה שאינה קיימת במערכת.
-2. בצעו git add, git commit, ו-git push לענף ה-main.
-3. עברו לדפדפן וזהו את הסטטוס הנכשל (X אדום) ב-UI של GitHub בלוח הבקרה של ה-Actions.
-4. בצעו פרוטוקול חקירה:
-   * היכנסו ל-Job התקול.
-   * בודדו את ה-Step הספציפי שנכשל.
-   * הרחיבו את תיקיית ה-Step ונתחו את ה-Raw Logs (הודעות ה-stderr). אתרו את השורה המדויקת שבה השרת מסביר את סיבת הקריסה.
-5. חזרו ל-VSCode, תקנו את השגיאה בקוד הלוקאלי שלכם, בצעו Push נוסף, ווודאו דרך ה-UI שהצינור (Pipeline) עובר בהצלחה וחוזר להיות ירוק.
+1. היכנסו ל־Repository שלכם ב־GitHub.
+2. פתחו את לשונית **Actions**.
+3. בחרו אחת מהתבניות המוצעות (לדוגמה: **Simple Workflow** או **Node.js**).
+4. מחקו את פקודות ברירת המחדל שבחלק `steps`.
+5. הוסיפו שתי פקודות `run`:
+
+   * פקודת `echo` שמדפיסה הודעה לבחירתכם.
+   * פקודה המציגה את גרסת שפת הפיתוח של הפרויקט (לדוגמה `node --version` או `python --version`).
+6. בצעו Commit ישירות לענף `main`.
+7. חזרו ללשונית **Actions** ועקבו אחר הריצה עד לסיומה.
+8. פתחו את ה־Logs ובדקו שכל השלבים הושלמו בהצלחה.
 
 ---
 
-## משימה 3: Automated Quality Gateways & Context Isolation (Linting)
+## משימה 2 – יצירת תקלה וניתוח ה־Logs
 
-### רקע והקשר
-אכיפת איכות קוד באמצעות סביבות Ephemeral Runners (שרתים ארעיים). משימה זו ממחישה את תאוריית "המטבח הריק" – ההבנה שה-Runner נוצר ריק לחלוטין ואינו מכיר את הפרויקט, ולכן קיימת חשיבות עליונה לפעולת ה-Checkout. נשתמש בכלי AI כדי להנדס את התשתית בצורה מקצועית.
+### שלבי העבודה
 
-### הנחיות לביצוע שלב-אחר-שלב
-1. פתחו מודל AI חיצוני בדפדפן לבחירתכם (Gemini / ChatGPT / Claude).
-2. העתיקו והדביקו את תבנית הפרומפט הבאה בשלמותה (השאירו אותה באנגלית כפי שהיא), אך החליפו את הסוגריים המרובעים במידע הרלוונטי מהפרויקט שלכם:
+1. צרו שגיאת Runtime מכוונת בפרויקט (לדוגמה פקודה שאינה קיימת או שגיאת Syntax).
+2. בצעו:
+
+   * `git add`
+   * `git commit`
+   * `git push`
+3. עברו ללשונית **Actions**.
+4. אתרו את ה־Workflow שנכשל.
+5. פתחו את הריצה ובדקו:
+
+   * איזה Job נכשל.
+   * איזה Step נכשל.
+   * מהי הודעת השגיאה.
+6. תקנו את הבעיה.
+7. בצעו Push נוסף וודאו שה־Pipeline מסתיים בהצלחה.
+
+---
+
+## משימה 3 – יצירת Workflow באמצעות AI
+
+במשימה זו תשתמשו בכלי AI כדי ליצור Workflow שמריץ את תהליך ה־Lint של הפרויקט.
+
+### שלבי העבודה
+
+1. פתחו את ChatGPT, Gemini או Claude.
+2. העתיקו את הפרומפט הבא.
+3. החליפו את המידע שבסוגריים במידע מהפרויקט שלכם.
+4. בקשו מהמודל ליצור את קובץ ה־Workflow.
+5. עברו על הקובץ והבינו כל חלק לפני שאתם משתמשים בו.
+6. הוסיפו את הקובץ ל־Repository ובדקו שהוא פועל.
 
 ```text
 [ROLE]: Expert DevOps Engineer enforcing enterprise-level CI/CD compliance standards.
-[CONTEXT]: Here is my configuration file: [Insert package.json / requirements.txt configuration data with your lint scripts].
-[OBJECTIVE]: Construct a valid GitHub Actions YAML file triggered on push to main to run the project's Lint script. Output only YAML.
-[CONSTRAINTS]: Run atop 'ubuntu-latest'. Must explicitly declare 'actions/checkout@v4' as step 01 because the runner starts empty.
+
+[CONTEXT]:
+Here is my configuration file:
+[Insert package.json / requirements.txt]
+
+[OBJECTIVE]:
+Construct a valid GitHub Actions YAML file triggered on push to main to run the project's Lint script.
+
+Output only YAML.
+
+[CONSTRAINTS]:
+Run atop ubuntu-latest.
+Must explicitly declare actions/checkout@v4 as step 01 because the runner starts empty.
+```
+
+---
+
+## שאלות לבדיקה עצמית
+
+1. מהו Workflow?
+2. מהו Event ב־GitHub Actions?
+3. מה ההבדל בין Workflow, Job ו־Step?
+4. מהו GitHub Runner?
+5. מדוע יש להשתמש ב־`actions/checkout`?
+6. היכן ניתן למצוא את הודעת השגיאה המלאה כאשר Workflow נכשל?
+7. מה ההבדל בין שגיאת YAML לבין שגיאת Runtime?
+8. מדוע חשוב להבין את הקוד שנוצר על ידי AI לפני שמשתמשים בו?
+
+---
+
+## טעויות נפוצות
+
+* שכחתם לבצע `git push`.
+* קובץ ה־Workflow אינו נמצא בתיקייה `.github/workflows`.
+* שגיאות הזחה (Indentation) בקובץ YAML.
+* שימוש בפקודה שאינה קיימת בפרויקט.
+* שכחתם להוסיף `actions/checkout`.
+* ניסיון לתקן את הבעיה לפני קריאת הודעת השגיאה בלוגים.
+* העתקת קוד שנוצר על ידי AI מבלי להבין את מטרתו.
+
+---
+
+## לסיכום
+
+במעבדה זו הכרתם את GitHub Actions, יצרתם Workflow ראשון, למדתם כיצד לקרוא את ה־Logs ולהבין את תהליך הריצה, וכן התנסיתם בשימוש בכלי AI ליצירת Workflow בסיסי.
+
+במעבדות הבאות נמשיך להרחיב את ה־Pipeline ונוסיף אליו יכולות נוספות כחלק מתהליך CI/CD מלא.
