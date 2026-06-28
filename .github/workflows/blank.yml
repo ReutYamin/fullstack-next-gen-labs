@@ -26,4 +26,4 @@ jobs:
         run: echo "Hello GitHub Actions"
 
       - name: show Node.js version
-        run: node --version
+        run: nodeeee --version
