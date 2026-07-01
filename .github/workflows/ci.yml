@@ -1,0 +1,25 @@
+name: Simple CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Starting CI pipeline
+        run: echo "Starting CI pipeline"
+
+      - name: List repository files
+        run: ls -la
+
+      - name: Simulate lint check
+        run: echo "Running lint checks... No issues found."
+
+      - name: Simulate test run
+        run: echo "Running tests... All tests passed."
