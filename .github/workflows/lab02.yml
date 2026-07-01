@@ -1,0 +1,32 @@
+name: lab 02 workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  project-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Display OS version
+        run: cat /etc/os-release
+
+      - name: Display node version
+        run: node --version
+
+      - name: Install dependencies
+        run: echo "installing dependencies"
+      
+      - name: Run project check
+        run: echo "project check is OK"
+
